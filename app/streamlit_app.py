@@ -12,16 +12,6 @@ from streamlit_folium import folium_static
 import json
 
 
-# 環境変数の読み込み
-load_dotenv()
-
-# 環境変数から認証情報を取得
-# Python コード
-SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
-PRIVATE_KEY_PATH = os.getenv("PRIVATE_KEY_PATH")
-SP_SHEET = 'シート1'  # シート名
-
-
 # セッション状態の初期化
 if 'show_all' not in st.session_state:
     st.session_state['show_all'] = False  # 初期状態は地図上の物件のみを表示
@@ -30,14 +20,29 @@ if 'show_all' not in st.session_state:
 def toggle_show_all():
     st.session_state['show_all'] = not st.session_state['show_all']
 
+# Streamlit_Shere_Sercret環境変数から認証情報を取得
+SPREADSHEET_ID = st.secrets["SPREADSHEET"]["ID"]
+SERVICE_ACCOUNT_INFO = st.secrets["SERVICE_ACCOUNT"]
+SP_SHEET = 'シート1'  # シート名
 
 # スプレッドシートからデータを読み込む関数
 def load_data_from_spreadsheet():
-    credentials = Credentials.from_service_account_file(
-        PRIVATE_KEY_PATH,
-        scopes=['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+    # googleスプレッドシートの認証 jsonファイル読み込み(key値はGCPから取得)
+    SP_CREDENTIAL_FILE = SERVICE_ACCOUNT_INFO
+    
+    scopes = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive'
+    ]
+
+    credentials = Credentials.from_service_account_info(
+        SP_CREDENTIAL_FILE,
+        scopes=scopes
     )
     gc = gspread.authorize(credentials)
+
+    SP_SHEET_KEY = SPREADSHEET_ID # d/〇〇/edit の〇〇部分
+    sh  = gc.open_by_key(SP_SHEET_KEY)
 
     # 物件データの読み込み
     sh = gc.open_by_key(SPREADSHEET_ID)
