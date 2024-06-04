@@ -126,8 +126,10 @@ def main():
     property_df, club_df = load_data_from_spreadsheet()  # 両方のデータフレームを取得
     property_df = preprocess_dataframe(property_df)  # 物件データの前処理
 
+    st.image('img.png')
+
     # StreamlitのUI要素（スライダー、ボタンなど）の各表示設定
-    st.title('賃貸物件情報の可視化')
+    st.title(':blue[smart] :green[FIT] :blue[&] :orange[HOUSE]')
 
     # エリアと家賃フィルタバーを1:2の割合で分割
     col1, col2 = st.columns([1, 2])
